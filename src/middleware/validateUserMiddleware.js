@@ -1,18 +1,20 @@
-const jwt  = require("jsonwebtoken");
-const User = require("../models/userSchema");
+const jwt = require('jsonwebtoken');
+const User = require('../models/userSchema');
 
 const validateUserToken = async (req, res, next) => {
   try {
     // ── 1. Check header exists ──────────────────────────────────────────────
     const authHeader = req.headers.authorization;
     if (!authHeader) {
-      return res.status(401).json({ success: false, message: "Authorization header not provided" });
+      return res.status(401).json({ success: false, message: 'Authorization header not provided' });
     }
 
     // ── 2. Must be "Bearer <token>" ─────────────────────────────────────────
-    const parts = authHeader.split(" ");
-    if (parts.length !== 2 || parts[0].toLowerCase() !== "bearer") {
-      return res.status(401).json({ success: false, message: "Invalid authorization format. Use: Bearer <token>" });
+    const parts = authHeader.split(' ');
+    if (parts.length !== 2 || parts[0].toLowerCase() !== 'bearer') {
+      return res
+        .status(401)
+        .json({ success: false, message: 'Invalid authorization format. Use: Bearer <token>' });
     }
 
     const token = parts[1];
@@ -22,9 +24,9 @@ const validateUserToken = async (req, res, next) => {
 
     // ── 4. Check user still exists in DB ────────────────────────────────────
     // Catches: deleted accounts still holding a valid token
-    const user = await User.findById(decoded.id ?? decoded._id).select("-password");
+    const user = await User.findById(decoded.id ?? decoded._id).select('-password');
     if (!user) {
-      return res.status(401).json({ success: false, message: "User no longer exists" });
+      return res.status(401).json({ success: false, message: 'User no longer exists' });
     }
 
     // ── 5. Attach full user to request ──────────────────────────────────────
@@ -32,21 +34,22 @@ const validateUserToken = async (req, res, next) => {
     req.user = user;
 
     next();
-
   } catch (err) {
     // ── 6. Specific JWT error messages ──────────────────────────────────────
-    if (err.name === "TokenExpiredError") {
-      return res.status(401).json({ success: false, message: "Token has expired, please log in again" });
+    if (err.name === 'TokenExpiredError') {
+      return res
+        .status(401)
+        .json({ success: false, message: 'Token has expired, please log in again' });
     }
-    if (err.name === "JsonWebTokenError") {
-      return res.status(401).json({ success: false, message: "Invalid token" });
+    if (err.name === 'JsonWebTokenError') {
+      return res.status(401).json({ success: false, message: 'Invalid token' });
     }
-    if (err.name === "NotBeforeError") {
-      return res.status(401).json({ success: false, message: "Token not yet active" });
+    if (err.name === 'NotBeforeError') {
+      return res.status(401).json({ success: false, message: 'Token not yet active' });
     }
 
     // Unexpected error (e.g. DB down)
-    return res.status(500).json({ success: false, message: "Authentication error" });
+    return res.status(500).json({ success: false, message: 'Authentication error' });
   }
 };
 
