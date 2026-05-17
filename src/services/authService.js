@@ -4,7 +4,7 @@ const {
   generateAccessToken,
   generateRefreshToken,
   verifyRefreshToken,
-} = require('../utils/jwtUtils');
+} = require('../utils/jwtUtils.js');
 
 // ── Register ───────────────────────────────────────────────────────────────
 const register = async ({ fullName, email, password, role }) => {

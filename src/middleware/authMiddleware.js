@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const { verifyAccessToken } = require('../utils/jwtUtils');
+const { verifyAccessToken } = require('../utils/jwtUtils.js');
 
 /**
  * protect — verifies the access token on protected routes
