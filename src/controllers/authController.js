@@ -1,89 +1,23 @@
 const authService = require('../services/authService');
-const {
-  registerSchema,
-  loginSchema,
-  refreshTokenSchema,
-} = require('../validators/authValidator');
-
+const { refreshTokenSchema } = require('../validators/authValidator');
+const successHandler = require('../handlers/successHandler');
+const asyncHandler = require('express-async-handler');
 // ── Register ───────────────────────────────────────────────────────────────
-const register = async (req, res, next) => {
-  try {
-    // 1. Validate request body with Joi
-    const { error, value } = registerSchema.validate(req.body, {
-      abortEarly: false, // return all errors, not just first
-    });
-
-    if (error) {
-      return res.status(422).json({
-        success: false,
-        message: 'Validation failed',
-        errors: error.details.map((d) => ({
-          field: d.context?.key,
-          message: d.message,
-        })),
-      });
-    }
-
-    // 2. Call service
-    const { user, accessToken, refreshToken } = await authService.register(value);
-
-    // 3. Respond
-    return res.status(201).json({
-      success: true,
-      message: 'Account created successfully',
-      data: {
-        user,
-        accessToken,
-        refreshToken,
-        expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN || '15m',
-      },
-    });
-  } catch (err) {
-    next(err);
-  }
-};
+const register = asyncHandler(async (req, res, next) => {
+  const user = await authService.register(value);
+  successHandler(res, user, 'Account created successfully', 201);
+});
 
 // ── Login ──────────────────────────────────────────────────────────────────
-const login = async (req, res, next) => {
-  try {
-    // 1. Validate request body with Joi
-    const { error, value } = loginSchema.validate(req.body, {
-      abortEarly: false,
-    });
-
-    if (error) {
-      return res.status(422).json({
-        success: false,
-        message: 'Validation failed',
-        errors: error.details.map((d) => ({
-          field: d.context?.key,
-          message: d.message,
-        })),
-      });
-    }
-
-    // 2. Call service
-    const { user, accessToken, refreshToken } = await authService.login(value);
-
-    // 3. Respond
-    return res.status(200).json({
-      success: true,
-      message: 'Login successful',
-      data: {
-        user,
-        accessToken,
-        refreshToken,
-        expiresIn: process.env.ACCESS_TOKEN_EXPIRES_IN || '15m',
-      },
-    });
-  } catch (err) {
-    next(err);
-  }
-};
+const login = asyncHandler(async (req, res) => {
+  const user = await authService.login(req.body);
+  successHandler(res, user, 'User Logged In successfully', 200);
+});
 
 // ── Refresh Access Token ───────────────────────────────────────────────────
 const refreshToken = async (req, res, next) => {
   try {
+    l;
     // 1. Validate request body
     const { error, value } = refreshTokenSchema.validate(req.body, {
       abortEarly: false,
@@ -101,8 +35,9 @@ const refreshToken = async (req, res, next) => {
     }
 
     // 2. Call service
-    const { accessToken, refreshToken: newRefreshToken } =
-      await authService.refreshAccessToken(value.refreshToken);
+    const { accessToken, refreshToken: newRefreshToken } = await authService.refreshAccessToken(
+      value.refreshToken
+    );
 
     // 3. Respond
     return res.status(200).json({

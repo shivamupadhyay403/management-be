@@ -5,7 +5,7 @@ const {
   generateRefreshToken,
   verifyRefreshToken,
 } = require('../utils/jwtUtils.js');
-
+const AppError = require('../utils/AppError');
 // ── Register ───────────────────────────────────────────────────────────────
 const register = async ({ fullName, email, password, role }) => {
   // 1. Check if email already exists
@@ -45,46 +45,27 @@ const register = async ({ fullName, email, password, role }) => {
 };
 
 // ── Login ──────────────────────────────────────────────────────────────────
+// services/authService.js
 const login = async ({ email, password }) => {
-  // 1. Find user by email
   const user = await User.findOne({ email });
-  if (!user) {
-    const error = new Error('Invalid email or password');
-    error.statusCode = 401;
-    throw error;
+
+  // Deliberately vague — don't leak whether email exists
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    throw new AppError('Invalid email or password', 401);
   }
 
-  // 2. Check if account is active
   if (!user.isActive) {
-    const error = new Error('Your account has been deactivated. Contact admin.');
-    error.statusCode = 403;
-    throw error;
+    throw new AppError('Account deactivated. Contact admin.', 403);
   }
 
-  // 3. Compare password
-  const isPasswordValid = await bcrypt.compare(password, user.password);
-  if (!isPasswordValid) {
-    const error = new Error('Invalid email or password');
-    error.statusCode = 401;
-    throw error;
-  }
-
-  // 4. Generate new tokens
   const accessToken = generateAccessToken(user);
   const refreshToken = generateRefreshToken(user);
 
-  // 5. Hash and update refresh token in DB
-  const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-  user.refreshToken = hashedRefreshToken;
+  user.refreshToken = await bcrypt.hash(refreshToken, 10);
   await user.save();
 
-  return {
-    user: sanitizeUser(user),
-    accessToken,
-    refreshToken,
-  };
+  return { user: sanitizeUser(user), accessToken, refreshToken };
 };
-
 // ── Refresh Access Token ───────────────────────────────────────────────────
 const refreshAccessToken = async (refreshToken) => {
   // 1. Verify the refresh token signature + expiry
@@ -94,6 +75,7 @@ const refreshAccessToken = async (refreshToken) => {
   } catch {
     const error = new Error('Invalid or expired refresh token');
     error.statusCode = 401;
+    error.data = null;
     throw error;
   }
 
@@ -102,6 +84,7 @@ const refreshAccessToken = async (refreshToken) => {
   if (!user || !user.refreshToken) {
     const error = new Error('Refresh token not found. Please login again.');
     error.statusCode = 401;
+    error.data = null;
     throw error;
   }
 
@@ -112,6 +95,7 @@ const refreshAccessToken = async (refreshToken) => {
     user.refreshToken = null;
     await user.save();
     const error = new Error('Refresh token reuse detected. Please login again.');
+    error.data = null;
     error.statusCode = 401;
     throw error;
   }
