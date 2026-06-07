@@ -1,11 +1,11 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema(
   {
     schoolId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "School",
-      required: true,
+      ref: 'School',
+      default: null,
     },
 
     name: {
@@ -26,13 +26,7 @@ const userSchema = new mongoose.Schema(
 
     role: {
       type: String,
-      enum: [
-        "super_admin",
-        "school_admin",
-        "teacher",
-        "student",
-        "parent",
-      ],
+      enum: ['super_admin', 'school_admin', 'teacher', 'student', 'parent'],
       required: true,
     },
 
@@ -46,4 +40,4 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("User", userSchema);
+module.exports = mongoose.model('User', userSchema);
