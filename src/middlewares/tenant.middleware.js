@@ -8,7 +8,6 @@ module.exports = (req, res, next) => {
     }
 
     req.schoolId = req.user.schoolId;
-
     next();
   } catch (error) {
     return res.status(500).json({

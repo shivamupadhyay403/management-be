@@ -20,26 +20,6 @@ exports.login = async (req, res, next) => {
   }
 };
 
-exports.refreshToken = async (req, res, next) => {
-  try {
-    const result = await authService.refreshToken(req.body.refreshToken);
-
-    return successHandler(res, result, 200, 'Token refreshed successfully');
-  } catch (err) {
-    next(err);
-  }
-};
-
-exports.logout = async (req, res, next) => {
-  try {
-    await authService.logout(req.body.refreshToken);
-
-    return successHandler(res, null, 200, 'Logged out successfully');
-  } catch (err) {
-    next(err);
-  }
-};
-
 exports.me = async (req, res, next) => {
   try {
     return successHandler(res, req.user, 200, 'User fetched successfully');

@@ -16,10 +16,6 @@ router.post('/register-school', validate(registerSchoolSchema), controller.regis
 
 router.post('/login', validate(loginSchema), controller.login);
 
-router.post('/refresh-token', controller.refreshToken);
-
-router.post('/logout', auth, controller.logout);
-
 router.get('/me', auth, controller.me);
 
 router.patch('/change-password', auth, validate(changePasswordSchema), controller.changePassword);
