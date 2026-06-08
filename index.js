@@ -6,12 +6,10 @@ const schoolRoute = require('./src/routes/school.routes');
 const authRoute = require('./src/routes/auth.routes');
 const teacherRoute = require('./src/routes/teacher.routes');
 const errorMiddleware = require('./src/middlewares/error.middleware');
+const createSuperAdmin = require('./src/seeds/superAdmin');
 dotenv.config();
 
 const app = express();
-
-// Connect to MongoDB
-connectDB();
 
 // Middlewares
 app.use(cors());
@@ -26,7 +24,21 @@ app.get('/api/v1/health', (req, res) => {
 });
 
 app.use(errorMiddleware);
-const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+
+
+
+async function startServer() {
+  try {
+    await connectDB();
+    await createSuperAdmin();
+    const PORT = process.env.PORT || 8000;
+    app.listen(PORT, () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  } catch (error) {
+    console.error(error);
+    process.exit(1);
+  }
+}
+
+startServer();
