@@ -25,6 +25,8 @@ app.get('/api/v1/health', (req, res) => {
 
 app.use(errorMiddleware);
 
+
+
 async function startServer() {
   try {
     await connectDB();
