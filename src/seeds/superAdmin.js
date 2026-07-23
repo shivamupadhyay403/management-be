@@ -1,20 +1,20 @@
 // src/utils/createSuperAdmin.js
 
+const { SUPER_ADMIN_PASSWORD, SUPER_ADMIN_EMAIL } = require('../config/env');
 const User = require('../models/user.model');
-const { hashPassword} = require('../utils/bcrypt');
+const { hashPassword } = require('../utils/bcrypt');
 
 async function createSuperAdmin() {
   const exists = await User.findOne({
-    email: process.env.SUPER_ADMIN_EMAIL,
+    email: SUPER_ADMIN_EMAIL,
   });
 
   if (exists) return;
 
   await User.create({
-    
     name: 'Platform Owner',
-    email: process.env.SUPER_ADMIN_EMAIL,
-    password: await hashPassword(process.env.SUPER_ADMIN_PASSWORD),
+    email: SUPER_ADMIN_EMAIL,
+    password: await hashPassword(SUPER_ADMIN_PASSWORD),
     role: 'super_admin',
   });
 

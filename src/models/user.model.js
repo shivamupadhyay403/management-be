@@ -39,5 +39,7 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
+userSchema.index({ schoolId: 1 });
+userSchema.index({ schoolId: 1, role: 1 });
+userSchema.index({ role: 1, isActive: 1 });
 module.exports = mongoose.model('User', userSchema);
