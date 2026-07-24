@@ -10,6 +10,7 @@ const logger = require("./src/logger/logger");
 const pinoHttp = require('pino-http');
 const compression = require('compression');
 const helmet = require('helmet');
+const cookieParser = require("cookie-parser");
 const { ALLOWED_ADDRESS } = require('./src/config/env');
 
 const app = express();
@@ -24,7 +25,8 @@ app.use(
     logger,
   }),
   helmet(),
-  compression()
+  compression(),
+  cookieParser()
 );
 app.use(express.json());
 

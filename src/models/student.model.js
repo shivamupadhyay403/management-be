@@ -1,28 +1,28 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 const studentSchema = new mongoose.Schema(
   {
     schoolId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "School",
+      ref: 'School',
       required: true,
       index: true,
     },
 
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       required: true,
     },
 
     parentId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Parent",
+      ref: 'Parent',
     },
 
     classId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Class",
+      ref: 'Class',
     },
 
     admissionNo: {
@@ -43,16 +43,25 @@ const studentSchema = new mongoose.Schema(
 
     gender: {
       type: String,
-      enum: ["male", "female", "other"],
+      enum: ['male', 'female', 'other'],
     },
 
     phone: String,
 
     address: String,
+    password: {
+      type: String,
+      required: true,
+    },
+
+    passwordChanged: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-module.exports = mongoose.model("Student", studentSchema);
+module.exports = mongoose.model('Student', studentSchema);

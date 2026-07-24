@@ -5,6 +5,7 @@ module.exports = {
   REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
   ACCESS_EXPIRY: process.env.JWT_ACCESS_EXPIRY || '15m',
   REFRESH_EXPIRY: process.env.JWT_REFRESH_EXPIRY || '7d',
+  SHORT_TIME_REFRESH_EXPIRY: process.env.SHORT_TIME_REFRESH_EXPIRY || '1d',
   ALLOWED_ADDRESS: process.env.ALLOWED_ADDRESS || '*',
   PORT: process.env.PORT || 8080,
   DB_URI: process.env.DB_URI,

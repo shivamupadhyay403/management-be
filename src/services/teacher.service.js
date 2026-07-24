@@ -1,6 +1,14 @@
 const Teacher = require('../models/teacher.model');
 const AppError = require('../utils/appError');
-
+const crypto = require('crypto');
+const bcrypt = require('bcrypt');
+function generateTemporaryPassword(length = 12) {
+  return crypto
+    .randomBytes(length)
+    .toString('base64')
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .slice(0, length);
+}
 exports.createTeacher = async (schoolId, payload) => {
   const existingTeacher = await Teacher.findOne({
     schoolId,
@@ -16,11 +24,20 @@ exports.createTeacher = async (schoolId, payload) => {
       throw new AppError('Teacher with this employee ID already exists', 409);
     }
   }
+  // Generate temporary password
+  const temporaryPassword = generateTemporaryPassword();
+
+  // Hash password
+  const hashedPassword = await bcrypt.hash(temporaryPassword, 10);
   const teacher = await Teacher.create({
     ...payload,
     schoolId,
+    password: hashedPassword,
+    passwordChanged: false,
   });
-  return teacher;
+  const { password, ...response } = teacher.toObject();
+
+  return response;
 };
 exports.getTeachers = async (schoolId, query) => {
   const page = Number(query.page) || 1;
@@ -39,6 +56,7 @@ exports.getTeachers = async (schoolId, query) => {
   }
 
   const teachers = await Teacher.find(filter)
+    .select('-password')
     .skip((page - 1) * limit)
     .limit(limit)
     .sort('-createdAt');
@@ -57,7 +75,7 @@ exports.getTeacherById = async (id, schoolId) => {
   const teacher = await Teacher.findOne({
     _id: id,
     schoolId,
-  });
+  }).select("-password");
 
   if (!teacher) {
     throw new AppError('Teacher not found', 404);
