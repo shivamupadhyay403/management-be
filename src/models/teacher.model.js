@@ -6,87 +6,89 @@ const teacherSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: 'School',
       required: true,
-      index: true
+      index: true,
     },
 
     employeeId: {
       type: String,
-      required: true
+      required: true,
     },
 
     firstName: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
 
     lastName: {
       type: String,
       required: true,
-      trim: true
+      trim: true,
     },
 
     email: {
       type: String,
       required: true,
-      lowercase: true
+      lowercase: true,
     },
 
     phone: {
       type: String,
-      required: true
+      required: true,
     },
 
     gender: {
       type: String,
-      enum: ['MALE', 'FEMALE', 'OTHER']
+      enum: ['MALE', 'FEMALE', 'OTHER'],
     },
 
     qualification: {
-      type: String
+      type: String,
     },
 
     experience: {
       type: Number,
-      default: 0
+      default: 0,
     },
 
     subject: {
-      type: String
+      type: String,
     },
 
     joiningDate: {
       type: Date,
-      default: Date.now
+      default: Date.now,
+    },
+    password: {
+      type: String,
+      required: true,
     },
 
+    passwordChanged: {
+      type: Boolean,
+      default: false,
+    },
     salary: {
-      type: Number
+      type: Number,
     },
 
     address: {
-      type: String
+      type: String,
     },
 
     status: {
       type: String,
       enum: ['ACTIVE', 'INACTIVE'],
-      default: 'ACTIVE'
-    }
+      default: 'ACTIVE',
+    },
   },
   {
-    timestamps: true
+    timestamps: true,
   }
 );
 
-teacherSchema.index(
-  { schoolId: 1, employeeId: 1 },
-  { unique: true }
-);
+teacherSchema.index({ schoolId: 1, employeeId: 1 }, { unique: true });
 
-teacherSchema.index(
-  { schoolId: 1, email: 1 },
-  { unique: true }
-);
+teacherSchema.index({ schoolId: 1, email: 1 }, { unique: true });
 
 module.exports = mongoose.model('Teacher', teacherSchema);
