@@ -14,7 +14,7 @@ const generateAccessToken = async (data, rememberMe = false) => {
     throw err;
   }
 };
-const generateRefreshToken = async (data, rememberMe) => {
+const generateRefreshToken = async (data, rememberMe=true) => {
   try {
     const token = jwt.sign(data, REFRESH_SECRET, {
       expiresIn: rememberMe ? '1d' : REFRESH_EXPIRY,

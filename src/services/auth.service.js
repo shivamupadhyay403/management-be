@@ -14,11 +14,11 @@ const buildTokenPayload = (user) => ({
   schoolId: user.schoolId?._id ?? user.schoolId ?? null,
   role: user.role,
 });
-const issueTokenPair = async (user, meta = {}) => {
+const issueTokenPair = async (user, meta = {},remember_me) => {
   // jti: a random unique ID that ties the DB row to the JWT
   const jti = crypto.randomBytes(32).toString('hex');
   const accessToken = generateAccessToken(buildTokenPayload(user));
-  const refreshToken = generateRefreshToken(user._id, jti);
+  const refreshToken = generateRefreshToken(user._id, jti,remember_me);
   // Persist refresh token to DB (enables revocation)
   await RefreshToken.create({
     jti,
@@ -85,7 +85,7 @@ exports.registerSchool = async (payload) => {
   };
 };
 exports.login = async (payload, meta = {}) => {
-  const { email, password } = payload;
+  const { email, password,remember_me } = payload;
 
   const user = await User.findOne({ email }).select('+password').populate('schoolId');
 
@@ -93,7 +93,7 @@ exports.login = async (payload, meta = {}) => {
 
   const isPasswordValid = await comparePassword(password, user.password);
   if (!isPasswordValid) throw new AppError('Invalid email or password', 401);
-  const { accessToken, refreshToken, expiresAt } = await issueTokenPair(user, meta);
+  const { accessToken, refreshToken, expiresAt } = await issueTokenPair(user, meta,remember_me);
   return {
     accessToken,
     refreshToken,
