@@ -75,7 +75,7 @@ exports.getTeacherById = async (id, schoolId) => {
   const teacher = await Teacher.findOne({
     _id: id,
     schoolId,
-  }).select("-password");
+  }).select('-password');
 
   if (!teacher) {
     throw new AppError('Teacher not found', 404);
@@ -84,7 +84,20 @@ exports.getTeacherById = async (id, schoolId) => {
 };
 
 exports.updateTeacher = async (id, schoolId, payload) => {
-  return Teacher.findOneAndUpdate(
+  // Check only if employeeId is being updated
+  if (payload.employeeId) {
+    const exists = await Teacher.exists({
+      employeeId: payload.employeeId,
+      schoolId,
+      _id: { $ne: id },
+    });
+
+    if (exists) {
+      throw new AppError('Employee ID already exists', 409);
+    }
+  }
+
+  const teacher = await Teacher.findOneAndUpdate(
     {
       _id: id,
       schoolId,
@@ -95,6 +108,12 @@ exports.updateTeacher = async (id, schoolId, payload) => {
       runValidators: true,
     }
   );
+
+  if (!teacher) {
+    throw new AppError('Teacher not found', 404);
+  }
+
+  return teacher;
 };
 
 exports.deleteTeacher = async (id, schoolId) => {

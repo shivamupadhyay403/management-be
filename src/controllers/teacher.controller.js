@@ -27,6 +27,7 @@ exports.getTeacher = async (req, res, next) => {
   }
 };
 
+
 exports.updateTeacher = async (req, res, next) => {
   try {
     const teacher = await teacherService.updateTeacher(req.params.id, req.schoolId, req.body);
