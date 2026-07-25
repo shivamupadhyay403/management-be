@@ -14,7 +14,7 @@ const controller = require('../controllers/school.controller');
 
 router.get('/me', auth, tenant, controller.getProfile);
 
-router.patch('/me', auth, tenant, validate(updateSchoolSchema), controller.updateSchool);
+router.patch('/update', auth, tenant, validate(updateSchoolSchema), controller.updateSchool);
 
 router.get('/stats', auth, tenant, controller.getStats);
 
